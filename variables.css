@@ -1,0 +1,51 @@
+/* CSS Variables - Global Design System */
+:root {
+  /* Brand Colors */
+  --primary-color: #ff471f;
+  --primary-dark: #e64a26;
+  --secondary-color: #5ce1e6;
+  --secondary-dark: #25c3d9;
+  
+  /* Background Colors */
+  --bg-primary: #fdf7ee;
+  --bg-card: #ceffff;
+  --bg-card-alt: #b7f0f8;
+  --bg-prediction: #0d6b74;
+  
+  /* Text Colors */
+  --text-primary: #0e1116;
+  --text-muted: #6b7280;
+  --text-white: #fff;
+  
+  /* Status Colors */
+  --status-success: #7dd56f;
+  --status-warning: #f6c247;
+  --status-error: #ef4444;
+  
+  /* UI Elements */
+  --border-radius: 28px;
+  --border-radius-sm: 12px;
+  --border-radius-lg: 36px;
+  --shadow: 0 10px 30px rgba(0,0,0,.08);
+  --shadow-sm: 0 4px 15px rgba(0,0,0,.1);
+  --shadow-lg: 0 24px 60px rgba(0,0,0,.25);
+  
+  /* Spacing */
+  --spacing-xs: 6px;
+  --spacing-sm: 12px;
+  --spacing-md: 18px;
+  --spacing-lg: 28px;
+  --spacing-xl: 40px;
+  
+  /* Typography */
+  --font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 24px;
+  
+  /* Transitions */
+  --transition-fast: 0.12s ease;
+  --transition-normal: 0.3s ease;
+}
