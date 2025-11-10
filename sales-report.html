@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GastroTrack - Sales Report</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --color-primary: #e14632;
+      --color-sidebar: #1f2430;
+      --color-sidebar-hover: #2d3341;
+      --color-text-primary: #1f2430;
+      --color-text-secondary: #6a6a6a;
+      --color-bg-main: #f6efe6;
+      --color-chart-bg: #e8d9f5;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+      --shadow-sm: 0 2px 6px rgba(0,0,0,.06);
+      --shadow-md: 0 4px 12px rgba(0,0,0,.1);
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      color: var(--color-text-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: flex;
+      min-height: 100vh;
+      background: var(--color-bg-main);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 140px;
+      background: var(--color-sidebar);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 0;
+      box-shadow: 2px 0 8px rgba(0,0,0,.1);
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px 24px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      width: 50px;
+      height: 50px;
+      background: var(--color-primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(225,70,50,.3);
+    }
+
+    .brand span {
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      text-align: center;
+      letter-spacing: -0.3px;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      padding: 0 12px;
+    }
+
+    .nav a {
+      display: block;
+      padding: 14px 12px;
+      color: rgba(255,255,255,.7);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      transition: .2s;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .nav a:hover {
+      background: var(--color-sidebar-hover);
+      color: #fff;
+    }
+
+    .nav a.active {
+      background: var(--color-primary);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(225,70,50,.4);
+    }
+
+    .spacer {
+      flex: 1;
+      min-height: 40px;
+    }
+
+    /* Main */
+    .main {
+      margin-left: 140px;
+      flex: 1;
+      padding: 32px 40px;
+      background: var(--color-bg-main);
+      min-height: 100vh;
+    }
+
+    /* Filters */
+    .filters-section {
+      background: #fff;
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.1);
+    }
+
+    .filters-section h2 {
+      margin-bottom: 16px;
+      font-size: 18px;
+    }
+
+    .category-filter-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .category-box {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: var(--radius-sm);
+      padding: 16px;
+    }
+
+    .category-box h3 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      font-weight: 600;
+      border-bottom: 1px solid #dee2e6;
+      padding-bottom: 8px;
+    }
+
+    .category-box label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .category-box input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--color-primary);
+    }
+
+    /* Chart */
+    .sales-overview {
+      background: var(--color-chart-bg);
+      border: 2px solid #9b7fb8;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .sales-overview h2 {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 350px;
+      background: #fff;
+      border-radius: var(--radius-md);
+      padding: 20px;
+    }
+
+    /* Category cards */
+    .categories-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .category-card {
+      background: #4a4a4a;
+      border: 2px solid #3a3a3a;
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      color: #fff;
+    }
+
+    .category-card h3 {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .category-icon {
+      width: 16px;
+      height: 16px;
+      background: #ff6b6b;
+      border-radius: 3px;
+    }
+
+    .category-items {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .category-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .item-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    /* Fixed action buttons */
+    .action-buttons {
+      position: fixed;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 50;
+    }
+
+    .action-btn {
+      background: #4a4a4a;
+      color: #fff;
+      border: 2px solid #3a3a3a;
+      border-radius: var(--radius-md);
+      padding: 16px 14px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      text-align: center;
+      cursor: pointer;
+      transition: .2s;
+      width: 100px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    }
+
+    .action-btn:hover {
+      background: #5a5a5a;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    }
+
+    .error-message {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 16px 0;
+      border: 1px solid #f5c6cb;
+      text-align: center;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+      background: white;
+      margin: 5% auto;
+      width: 90%;
+      max-width: 600px;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      animation: modalFadeIn 0.3s ease;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 25px;
+      border-bottom: 2px solid #f1f3f4;
+      background: linear-gradient(135deg, var(--color-primary), #d63821);
+      color: white;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      color: white;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background-color 0.2s ease;
+    }
+
+    .modal-close:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .modal-body {
+      padding: 25px;
+    }
+
+    .form-section {
+      margin-bottom: 25px;
+    }
+
+    .form-section h3 {
+      margin-bottom: 15px;
+      color: var(--color-text-primary);
+      font-size: 1.1rem;
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .input-row select,
+    .input-row input {
+      padding: 10px 12px;
+      border: 2px solid #e1e5e9;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      transition: border-color 0.2s ease;
+    }
+
+    .input-row select:focus,
+    .input-row input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+
+    .input-row input[type="number"] {
+      width: 80px;
+    }
+
+    .btn-add {
+      padding: 10px 15px;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-add:hover {
+      background: #d63821;
+    }
+
+    .sale-items-section h3 {
+      margin-bottom: 15px;
+      color: var(--color-text-primary);
+      font-size: 1.1rem;
+    }
+
+    .sale-items-list {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 2px solid #f1f3f4;
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      margin-bottom: 15px;
+    }
+
+    .no-items {
+      color: var(--color-text-secondary);
+      text-align: center;
+      padding: 20px;
+      font-style: italic;
+    }
+
+    .sale-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid #f1f3f4;
+      background: #fafbfc;
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+    }
+
+    .sale-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .sale-item-info {
+      flex: 1;
+    }
+
+    .sale-item-name {
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .sale-item-details {
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+    }
+
+    .btn-remove {
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 10px;
+    }
+
+    .btn-remove:hover {
+      background: #c82333;
+      transform: scale(1.1);
+    }
+
+    .sale-total {
+      text-align: center;
+      padding: 15px 0;
+      font-size: 1.1rem;
+      color: var(--color-primary);
+      background: #f8f9fa;
+      border-radius: var(--radius-sm);
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      padding: 20px 25px;
+      border-top: 2px solid #f1f3f4;
+      background: #fafbfc;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    }
+
+    .btn-cancel,
+    .btn-submit {
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .btn-cancel {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-cancel:hover {
+      background: #5a6268;
+    }
+
+    .btn-submit {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .btn-submit:hover {
+      background: #d63821;
+    }
+
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: var(--color-text-secondary);
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #e9ecef;
+      border-top: 2px solid var(--color-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 1200px) {
+      .action-buttons { display: none; }
+      .categories-section { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { width: 80px; }
+      .brand span { font-size: 11px; }
+      .nav a { padding: 12px 8px; font-size: 11px; }
+      .main { margin-left: 80px; padding: 24px 20px; }
+      .chart-container { height: 300px; padding: 12px; }
+      .sales-overview { padding: 16px; }
+      .category-card { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <span style="font-size:28px">👨🏻‍🍳</span>
+      </div>
+      <span>GastroTrack</span>
+    </div>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a href="dashboard.html"><span>Dashboard</span></a>
+      <a href="inventory.html"><span>Inventory</span></a>
+      <a href="expiry-calendar.html"><span>Expiry Calendar</span></a>
+      <a class="active" href="sales-report.html"><span>Sales Report</span></a>
+      <a href="cost-waste.html"><span>Cost & Waste</span></a>
+      <a href="suggestions.html"><span>Suggestions</span></a>
+      <a href="menu-insights.html"><span>Menu Insights</span></a>
+    </nav>
+
+    <div class="spacer"></div>
+    <nav class="nav">
+      <a href="profile.html"><span>Profile</span></a>
+      <a href="logout.html"><span>Log Out</span></a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- Category Filters -->
+    <section class="filters-section">
+      <h2>Filter by Categories</h2>
+      <div id="category-filters" class="category-filter-container">
+        <div class="loading">
+          <div class="spinner"></div>
+          Loading filters...
+        </div>
+      </div>
+    </section>
+
+    <!-- Sales Overview Chart -->
+    <section class="sales-overview">
+      <h2>Sales Overview (Last 7 Days)</h2>
+      <div class="chart-container">
+        <canvas id="salesChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories-section" id="categoriesSection">
+      <div class="loading">
+        <div class="spinner"></div>
+        Loading category data...
+      </div>
+    </section>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="action-btn" onclick="viewItemReport()">VIEW ITEM<br>REPORT</button>
+      <button class="action-btn" onclick="viewDemandPrediction()">VIEW DEMAND<br>PREDICTION</button>
+      <button class="action-btn" onclick="showLogSalesModal()">LOG<br>SALES</button>
+    </div>
+  </main>
+
+  <!-- Log Sales Modal -->
+  <div id="logSalesModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📝 Log Sales</h2>
+        <button class="modal-close" onclick="closeLogSalesModal()">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="form-section">
+          <h3>Add Items to Sale</h3>
+          <div class="item-input-group">
+            <div class="input-row">
+              <select id="categorySelect" onchange="loadItemsByCategory()">
+                <option value="">Select Category</option>
+              </select>
+              <select id="itemSelect">
+                <option value="">Select Item</option>
+              </select>
+              <input type="number" id="quantityInput" placeholder="Quantity" min="1" value="1">
+              <button type="button" onclick="addSaleItem()" class="btn-add">Add</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sale-items-section">
+          <h3>Items in Current Sale</h3>
+          <div id="saleItemsList" class="sale-items-list">
+            <p class="no-items">No items added yet</p>
+          </div>
+          <div class="sale-total">
+            <strong><span id="saleTotal">0 items</span></strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" onclick="closeLogSalesModal()" class="btn-cancel">Cancel</button>
+        <button type="button" onclick="submitSale()" class="btn-submit">Submit Sale</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Config - matches your Python backend
+    const API_BASE = 'http://127.0.0.1:5000';
+    let salesChart = null;
+
+    // Helper function for API calls
+    async function fetchJSON(url) {
+      try {
+        const res = await fetch(url, { 
+          headers: { 'Content-Type': 'application/json' } 
+        });
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+        return res.json();
+      } catch (error) {
+        console.error('API fetch error:', error);
+        throw error;
+      }
+    }
+
+    async function fetchSalesData() {
+      try {
+        // 1) Get overview data for chart (matches /api/sales/overview)
+        const overviewData = await fetchJSON(`${API_BASE}/api/sales/overview`);
+        renderChart(overviewData);
+        loadCategoryFilters(overviewData);
+
+        // 2) Get categories data (matches /api/sales)
+        const salesData = await fetchJSON(`${API_BASE}/api/sales`);
+        renderCategories(salesData.categories);
+
+      } catch (err) {
+        console.error('Sales data fetch error:', err);
+        showErrorMessage('Failed to load sales data. Please check if the server is running on port 5000.');
+      }
+    }
+
+    function renderChart(overviewData) {
+      // Expected format from your Python backend:
+      // {
+      //   "Latte": { "category": "Beverages", "sales": { "Monday": 5, "Tuesday": 3, ... } },
+      //   ...
+      // }
+
+      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+      const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#e67e22'];
+
+      const datasets = [];
+      let colorIndex = 0;
+
+      Object.keys(overviewData || {}).forEach(itemName => {
+        const item = overviewData[itemName];
+        const salesData = item.sales || {};
+        
+        datasets.push({
+          label: itemName,
+          data: days.map(day => Number(salesData[day] || 0)),
+          borderColor: colors[colorIndex % colors.length],
+          backgroundColor: colors[colorIndex % colors.length] + '20',
+          borderWidth: 2,
+          fill: false,
+          tension: 0.4
+        });
+        colorIndex++;
+      });
+
+      // Create/update chart
+      const ctx = document.getElementById('salesChart');
+      if (ctx) {
+        if (salesChart) salesChart.destroy();
+        
+        salesChart = new Chart(ctx.getContext('2d'), {
+          type: 'line',
+          data: { 
+            labels: days.map(d => d.slice(0, 3)), // Mon, Tue, etc.
+            datasets 
+          },
+          options: {
+            responsive: true, 
+            maintainAspectRatio: false,
+            interaction: { 
+              mode: 'index', 
+              intersect: false 
+            },
+            plugins: {
+              title: {
+                display: true,
+                text: 'Daily Sales by Item (Last 7 Days)'
+              },
+              legend: { 
+                display: true, 
+                position: 'top',
+                labels: { 
+                  boxWidth: 12, 
+                  usePointStyle: true, 
+                  font: { size: 11 }
+                }
+              },
+              tooltip: { 
+                backgroundColor: 'rgba(0,0,0,.8)', 
+                padding: 12, 
+                cornerRadius: 8
+              }
+            },
+            scales: {
+              y: { 
+                beginAtZero: true, 
+                title: { display: true, text: 'Quantity Sold' },
+                ticks: { stepSize: 1 }
+              },
+              x: { 
+                title: { display: true, text: 'Day of Week' }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    function renderCategories(categories) {
+      // Expected format from your Python backend:
+      // [
+      //   { "name": "Beverages", "items": [{ "name": "Latte", "color": "#e74c3c" }, ...] },
+      //   ...
+      // ]
+
+      const section = document.getElementById('categoriesSection');
+      if (!section || !categories) return;
+
+      section.innerHTML = '';
+      
+      categories.forEach(category => {
+        const card = document.createElement('div');
+        card.className = 'category-card';
+        
+        card.innerHTML = `
+          <h3>
+            <span class="category-icon"></span>
+            ${category.name}
+          </h3>
+          <div class="category-items">
+            ${(category.items || []).map(item => `
+              <div class="category-item">
+                <span class="item-indicator" style="background: ${item.color || '#ccc'};"></span>
+                <span>${item.name}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        
+        section.appendChild(card);
+      });
+    }
+
+    function loadCategoryFilters(overviewData) {
+      const container = document.getElementById('category-filters');
+      if (!container || !overviewData) return;
+      
+      container.innerHTML = '';
+
+      // Group items by category
+      const categories = {};
+      Object.keys(overviewData).forEach(itemName => {
+        const item = overviewData[itemName];
+        const categoryName = item.category || 'Other';
+        
+        if (!categories[categoryName]) {
+          categories[categoryName] = [];
+        }
+        categories[categoryName].push(itemName);
+      });
+
+      // Create filter boxes
+      Object.keys(categories).forEach(categoryName => {
+        const box = document.createElement('div');
+        box.className = 'category-box';
+        
+        box.innerHTML = `
+          <h3>${categoryName}</h3>
+          ${categories[categoryName].map(itemName => `
+            <label>
+              <input type="checkbox" data-item="${itemName}" checked> 
+              ${itemName}
+            </label>
+          `).join('')}
+        `;
+        
+        container.appendChild(box);
+      });
+
+      // Add event listener for filter changes
+      container.addEventListener('change', updateChartVisibility);
+    }
+
+    function updateChartVisibility() {
+      if (!salesChart) return;
+      
+      const checkboxes = document.querySelectorAll('#category-filters input[type="checkbox"]');
+      const visibleItems = Array.from(checkboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.dataset.item);
+      
+      salesChart.data.datasets.forEach((dataset, index) => {
+        const meta = salesChart.getDatasetMeta(index);
+        meta.hidden = !visibleItems.includes(dataset.label);
+      });
+      
+      salesChart.update('none');
+    }
+
+    function showErrorMessage(message) {
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error-message';
+      errorDiv.textContent = message;
+      
+      const main = document.querySelector('.main');
+      if (main) {
+        main.insertBefore(errorDiv, main.firstChild);
+        setTimeout(() => errorDiv.remove(), 8000);
+      }
+    }
+
+    // Action button functions
+    function viewItemReport() { 
+      window.location.href = 'item-sales-report.html'; 
+    }
+    
+    function viewDemandPrediction() {
+      window.location.href = 'demand-prediction.html';
+    }
+    
+    // Log Sales Modal Functions
+    let saleItems = [];
+    let categories = [];
+    let menuItems = [];
+
+    function showLogSalesModal() {
+      loadCategories();
+      document.getElementById('logSalesModal').style.display = 'block';
+    }
+
+    function closeLogSalesModal() {
+      document.getElementById('logSalesModal').style.display = 'none';
+      clearSaleItems();
+    }
+
+    async function loadCategories() {
+      try {
+        const data = await fetchJSON(`${API_BASE}/api/menu/categories`);
+        if (data && data.success) {
+          categories = data.data;
+          const categorySelect = document.getElementById('categorySelect');
+          categorySelect.innerHTML = '<option value="">Select Category</option>';
+          
+          categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.category_id;
+            option.textContent = category.category_name;
+            categorySelect.appendChild(option);
+          });
+        }
+      } catch (error) {
+        console.error('Error loading categories:', error);
+        showErrorMessage('Failed to load categories');
+      }
+    }
+
+    async function loadItemsByCategory() {
+      const categoryId = document.getElementById('categorySelect').value;
+      const itemSelect = document.getElementById('itemSelect');
+      
+      itemSelect.innerHTML = '<option value="">Select Item</option>';
+      
+      if (!categoryId) return;
+
+      try {
+        const data = await fetchJSON(`${API_BASE}/api/menu/items?category_id=${categoryId}`);
+        if (data && data.success) {
+          menuItems = data.data;
+          
+          menuItems.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.item_id;
+            option.textContent = item.item_name;
+            option.dataset.name = item.item_name;
+            itemSelect.appendChild(option);
+          });
+        }
+      } catch (error) {
+        console.error('Error loading items:', error);
+        // For demo purposes, add some sample items if API fails
+        const sampleItems = [
+          { item_id: 1, item_name: 'Fried Rice' },
+          { item_id: 2, item_name: 'Grilled Chicken' },
+          { item_id: 3, item_name: 'Iced Coffee' },
+          { item_id: 4, item_name: 'Fresh Juice' }
+        ];
+        
+        sampleItems.forEach(item => {
+          const option = document.createElement('option');
+          option.value = item.item_id;
+          option.textContent = item.item_name;
+          option.dataset.name = item.item_name;
+          itemSelect.appendChild(option);
+        });
+      }
+    }
+
+    function addSaleItem() {
+      const itemSelect = document.getElementById('itemSelect');
+      const quantityInput = document.getElementById('quantityInput');
+      
+      const selectedOption = itemSelect.options[itemSelect.selectedIndex];
+      const quantity = parseInt(quantityInput.value) || 1;
+      
+      if (!selectedOption.value) {
+        alert('Please select an item');
+        return;
+      }
+      
+      if (quantity < 1) {
+        alert('Quantity must be at least 1');
+        return;
+      }
+      
+      const itemId = selectedOption.value;
+      const itemName = selectedOption.dataset.name;
+      
+      // Check if item already exists in sale
+      const existingItemIndex = saleItems.findIndex(item => item.itemId === itemId);
+      
+      if (existingItemIndex !== -1) {
+        // Update existing item quantity
+        saleItems[existingItemIndex].quantity += quantity;
+      } else {
+        // Add new item (no pricing needed)
+        saleItems.push({
+          itemId: itemId,
+          itemName: itemName,
+          quantity: quantity
+        });
+      }
+      
+      // Reset inputs
+      quantityInput.value = 1;
+      itemSelect.selectedIndex = 0;
+      
+      updateSaleItemsList();
+    }
+
+    function updateSaleItemsList() {
+      const container = document.getElementById('saleItemsList');
+      const totalElement = document.getElementById('saleTotal');
+      
+      if (saleItems.length === 0) {
+        container.innerHTML = '<p class="no-items">No items added yet</p>';
+        totalElement.textContent = `${saleItems.length} items`;
+        return;
+      }
+      
+      const itemsHtml = saleItems.map((item, index) => `
+        <div class="sale-item">
+          <div class="sale-item-info">
+            <div class="sale-item-name">${item.itemName}</div>
+            <div class="sale-item-details">Quantity: ${item.quantity}</div>
+          </div>
+          <button class="btn-remove" onclick="removeSaleItem(${index})" title="Remove item">&times;</button>
+        </div>
+      `).join('');
+      
+      container.innerHTML = itemsHtml;
+      
+      const totalItems = saleItems.reduce((sum, item) => sum + item.quantity, 0);
+      totalElement.textContent = `${totalItems} items total`;
+    }
+
+    function removeSaleItem(index) {
+      saleItems.splice(index, 1);
+      updateSaleItemsList();
+    }
+
+    function clearSaleItems() {
+      saleItems = [];
+      document.getElementById('categorySelect').selectedIndex = 0;
+      document.getElementById('itemSelect').innerHTML = '<option value="">Select Item</option>';
+      document.getElementById('quantityInput').value = 1;
+      updateSaleItemsList();
+    }
+
+    async function submitSale() {
+      if (saleItems.length === 0) {
+        alert('Please add at least one item to the sale');
+        return;
+      }
+      
+      const saleData = {
+        items: saleItems,
+        sale_date: new Date().toISOString(),
+        total_items: saleItems.reduce((sum, item) => sum + item.quantity, 0)
+      };
+      
+      try {
+        const response = await fetch(`${API_BASE}/api/sales/log`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(saleData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          alert(`Sale logged successfully! ${saleData.total_items} items recorded.`);
+          closeLogSalesModal();
+          // Refresh the sales data
+          fetchSalesData();
+        } else {
+          throw new Error(result.error || 'Failed to log sale');
+        }
+      } catch (error) {
+        console.error('Error logging sale:', error);
+        alert('Error logging sale: ' + error.message);
+      }
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('logSalesModal');
+      if (event.target === modal) {
+        closeLogSalesModal();
+      }
+    }
+
+    // Initialize when page loads
+    window.addEventListener('load', fetchSalesData);
+  </script>
+</body>
+</html>

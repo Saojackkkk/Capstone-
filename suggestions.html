@@ -1,0 +1,665 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GastroTrack - Suggestions</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===== CSS VARIABLES ===== */
+    :root {
+      /* Colors */
+      --color-primary: #e14632;
+      --color-sidebar: #1f2430;
+      --color-sidebar-hover: #2d3341;
+      --color-text-primary: #1f2430;
+      --color-text-secondary: #6a6a6a;
+      --color-bg-main: #f6efe6;
+      --color-bg-card: #e2e2e2;
+      --color-bg-card-header: #cfcfcf;
+      --color-border: #d6d6d6;
+      
+      /* Spacing */
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 12px;
+      --spacing-lg: 18px;
+      --spacing-xl: 24px;
+      
+      /* Border radius */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+      
+      /* Shadows */
+      --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 6px 14px rgba(0, 0, 0, 0.12);
+      
+      /* Typography */
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      color: var(--color-text-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: flex;
+      min-height: 100vh;
+      background: var(--color-bg-main);
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 140px;
+      background: var(--color-sidebar);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 0;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      width: 50px;
+      height: 50px;
+      background: var(--color-primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(225, 70, 50, 0.3);
+    }
+
+    .brand span {
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      text-align: center;
+      letter-spacing: -0.3px;
+    }
+
+    /* ===== NAVIGATION ===== */
+    .nav {
+      display: flex;
+      flex-direction: column;
+      padding: 0 12px;
+    }
+
+    .nav a {
+      position: relative;
+      display: block;
+      padding: 14px 12px;
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+      text-align: center;
+      line-height: 1.3;
+      margin-bottom: 4px;
+      z-index: 2;
+      pointer-events: auto;
+    }
+
+    .nav a:hover {
+      background: var(--color-sidebar-hover);
+      color: #fff;
+    }
+
+    .nav a.active {
+      background: var(--color-primary);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(225, 70, 50, 0.4);
+    }
+
+    .spacer {
+      flex: 1;
+      min-height: 40px;
+    }
+
+    /* ===== MAIN CONTENT AREA ===== */
+    .main {
+      margin-left: 140px;
+      flex: 1;
+      padding: 32px 40px;
+      background: var(--color-bg-main);
+      min-height: 100vh;
+    }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+      margin-bottom: 28px;
+    }
+
+    .page-header h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--color-text-primary);
+      margin: 0;
+    }
+
+    /* ===== SUGGESTIONS CONTAINER ===== */
+    .suggestions-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 900px;
+    }
+
+    /* ===== SUGGESTION CARD ===== */
+    .suggestion-card {
+      background: #d8d8d8;
+      border: 2px solid #c5c5c5;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+      animation: slideIn 0.4s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .suggestion-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .suggestion-content {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--color-text-primary);
+    }
+
+    .suggestion-content strong {
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+
+    /* ===== NEW SUGGESTION CARD ELEMENTS ===== */
+    .suggestion-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .suggestion-meta {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .suggestion-category {
+      background: var(--color-bg-card-header);
+      color: var(--color-text-secondary);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .suggestion-priority {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .priority-1 { background: #fee; color: #c53030; } /* Critical - Red */
+    .priority-2 { background: #fef5e7; color: #d69e2e; } /* High - Orange */
+    .priority-3 { background: #ebf8ff; color: #3182ce; } /* Medium - Blue */
+    .priority-4 { background: #f0fff4; color: #38a169; } /* Low - Green */
+
+    .suggestion-id {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      font-weight: 500;
+    }
+
+    .suggestion-title h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin: 8px 0;
+    }
+
+    .suggestion-footer {
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .suggestion-time {
+      color: var(--color-text-secondary);
+      font-size: 11px;
+    }
+
+    /* Action type styling */
+    .suggestion-card.critical {
+      border-left: 4px solid #e53e3e;
+      background: linear-gradient(135deg, #fed7d7 0%, #ffffff 100%);
+    }
+
+    .suggestion-card.warning {
+      border-left: 4px solid #d69e2e;
+      background: linear-gradient(135deg, #fef5e7 0%, #ffffff 100%);
+    }
+
+    .suggestion-card.success {
+      border-left: 4px solid #38a169;
+      background: linear-gradient(135deg, #f0fff4 0%, #ffffff 100%);
+    }
+
+    .suggestion-card.info {
+      border-left: 4px solid #3182ce;
+      background: linear-gradient(135deg, #ebf8ff 0%, #ffffff 100%);
+    }
+
+    /* Alert messages */
+    .success-alert {
+      background: #f0fff4;
+      border: 1px solid #9ae6b4;
+      color: #276749;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .success-alert button {
+      background: none;
+      border: none;
+      color: #276749;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0 5px;
+    }
+
+    .error-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--color-text-secondary);
+    }
+
+    .error-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .error-state h3 {
+      color: #e53e3e;
+      margin-bottom: 8px;
+    }
+
+    .retry-btn {
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 16px;
+      transition: background-color 0.2s ease;
+    }
+
+    .retry-btn:hover {
+      background: #c53030;
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--color-text-secondary);
+    }
+
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-bottom: 8px;
+    }
+
+    .empty-state p {
+      font-size: 15px;
+      color: var(--color-text-secondary);
+    }
+
+    /* ===== LOADING STATE ===== */
+    .loading-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #e0e0e0;
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 15px;
+      color: var(--color-text-secondary);
+      font-weight: 600;
+    }
+
+    /* ===== RESPONSIVE DESIGN ===== */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 80px;
+      }
+      
+      .brand span {
+        font-size: 11px;
+      }
+      
+      .nav a {
+        padding: 12px 8px;
+        font-size: 11px;
+      }
+      
+      .main {
+        margin-left: 80px;
+        padding: 24px 20px;
+      }
+
+      .page-header h1 {
+        font-size: 18px;
+      }
+
+      .suggestion-card {
+        padding: 20px;
+      }
+
+      .suggestion-content {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+   <aside class="sidebar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"><span style="font-size:28px">👨🏻‍🍳</span></div>
+      <span>GastroTrack</span>
+    </div>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a href="dashboard.html"><span>Dashboard</span></a>
+      <a href="inventory.html"><span>Inventory</span></a>
+      <a href="expiry-calendar.html"><span>Expiry Calendar</span></a>
+      <a href="sales-report.html"><span>Sales Report</span></a>
+      <a href="cost-waste.html"><span>Cost & Waste</span></a>
+      <a class="active" href="suggestions.html"><span>Suggestions</span></a>
+      <a href="menu-insights.html"><span>Menu Insights</span></a>
+    </nav>
+
+    <div class="spacer"></div>
+    <nav class="nav">
+      <a href="profile.html"><span>Profile</span></a>
+      <a href="logout.html"><span>Log Out</span></a>
+    </nav>
+  </aside>
+  
+  <!-- MAIN -->
+  <main class="main">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>Suggestions and analysis by GastroTrack</h1>
+    </div>
+
+    <!-- Suggestions Container -->
+    <div class="suggestions-container" id="suggestionsContainer">
+      <!-- Suggestions will be loaded here -->
+    </div>
+  </main>
+
+  <!-- JavaScript -->
+  <script>
+    // Configuration for dynamic suggestions API
+    const API_BASE = 'http://localhost:5002';
+    let currentSuggestions = [];
+
+    // Function to render suggestions
+    function renderSuggestions(suggestions) {
+      const container = document.getElementById('suggestionsContainer');
+      
+      if (!suggestions || suggestions.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">💡</div>
+            <h3>No suggestions available</h3>
+            <p>Start logging sales and inventory data to receive intelligent business insights.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '';
+      
+      suggestions.forEach((suggestion, index) => {
+        const card = document.createElement('div');
+        card.className = `suggestion-card ${suggestion.action_type || 'info'}`;
+        card.style.animationDelay = `${index * 0.1}s`;
+        
+        card.innerHTML = `
+          <div class="suggestion-header">
+            <div class="suggestion-meta">
+              <span class="suggestion-category">${suggestion.category || 'General'}</span>
+              <span class="suggestion-priority priority-${suggestion.priority || 3}">
+                ${getPriorityLabel(suggestion.priority)}
+              </span>
+            </div>
+            <span class="suggestion-id">#${suggestion.id}</span>
+          </div>
+          <div class="suggestion-title">
+            <h4>${suggestion.title || 'Business Insight'}</h4>
+          </div>
+          <div class="suggestion-content">
+            <p>${suggestion.content}</p>
+          </div>
+          <div class="suggestion-footer">
+            <small class="suggestion-time">
+              ${suggestion.timestamp ? formatTimestamp(suggestion.timestamp) : 'Just now'}
+            </small>
+          </div>
+        `;
+        
+        container.appendChild(card);
+      });
+      
+      // Store current suggestions for refresh functionality
+      currentSuggestions = suggestions;
+    }
+
+    // Helper function to get priority label
+    function getPriorityLabel(priority) {
+      switch(priority) {
+        case 1: return 'CRITICAL';
+        case 2: return 'HIGH';
+        case 3: return 'MEDIUM';
+        case 4: return 'LOW';
+        default: return 'INFO';
+      }
+    }
+
+    // Helper function to format timestamp
+    function formatTimestamp(timestamp) {
+      try {
+        const date = new Date(timestamp);
+        return date.toLocaleString();
+      } catch (e) {
+        return 'Recent';
+      }
+    }
+
+    // Function to show loading state
+    function showLoading() {
+      const container = document.getElementById('suggestionsContainer');
+      container.innerHTML = `
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">Analyzing your data...</p>
+        </div>
+      `;
+    }
+
+    // Function to load suggestions from API
+    async function loadSuggestions() {
+      showLoading();
+      
+      try {
+        const response = await fetch(`${API_BASE}/api/suggestions`);
+        const result = await response.json();
+        
+        if (result.success) {
+          renderSuggestions(result.suggestions);
+          
+          // Show summary info if available
+          if (result.categories && result.categories.length > 0) {
+            console.log(`Loaded ${result.total_count} suggestions across ${result.categories.length} categories:`, result.categories);
+          }
+        } else {
+          throw new Error(result.error || 'Failed to load suggestions');
+        }
+      } catch (error) {
+        console.error('Error loading suggestions:', error);
+        showError('Unable to load suggestions. Please check your connection and try again.');
+      }
+    }
+
+    // Function to refresh suggestions analysis
+    async function generateSuggestions() {
+      showLoading();
+      
+      try {
+        const response = await fetch(`${API_BASE}/api/suggestions/refresh`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          renderSuggestions(result.suggestions);
+          showSuccessMessage(`Analysis refreshed! Found ${result.total_count} new insights.`);
+        } else {
+          throw new Error(result.error || 'Failed to refresh suggestions');
+        }
+      } catch (error) {
+        console.error('Error refreshing suggestions:', error);
+        showError('Unable to refresh suggestions. Using cached data instead.');
+        // Fallback to loading cached suggestions
+        loadSuggestions();
+      }
+    }
+
+    // Function to show error message
+    function showError(message) {
+      const container = document.getElementById('suggestionsContainer');
+      container.innerHTML = `
+        <div class="error-state">
+          <div class="error-icon">⚠️</div>
+          <h3>Unable to Load Suggestions</h3>
+          <p>${message}</p>
+          <button onclick="loadSuggestions()" class="retry-btn">Try Again</button>
+        </div>
+      `;
+    }
+
+    // Function to show success message
+    function showSuccessMessage(message) {
+      const existingAlert = document.querySelector('.success-alert');
+      if (existingAlert) existingAlert.remove();
+      
+      const alert = document.createElement('div');
+      alert.className = 'success-alert';
+      alert.innerHTML = `
+        <span>✅ ${message}</span>
+        <button onclick="this.parentElement.remove()">&times;</button>
+      `;
+      
+      document.querySelector('.main').insertBefore(alert, document.querySelector('.main').firstChild);
+      
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        if (alert.parentElement) alert.remove();
+      }, 5000);
+    }
+
+    // Initialize page
+    window.addEventListener('load', function() {
+      loadSuggestions();
+    });
+
+    // Also try to load immediately in case load event already fired
+    if (document.readyState === 'complete') {
+      loadSuggestions();
+    }
+  </script>
+</body>
+</html>

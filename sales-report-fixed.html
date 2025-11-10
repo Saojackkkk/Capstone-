@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GastroTrack - Sales Report</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --color-primary: #e14632;
+      --color-sidebar: #1f2430;
+      --color-sidebar-hover: #2d3341;
+      --color-text-primary: #1f2430;
+      --color-text-secondary: #6a6a6a;
+      --color-bg-main: #f6efe6;
+      --color-chart-bg: #e8d9f5;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+      --shadow-sm: 0 2px 6px rgba(0,0,0,.06);
+      --shadow-md: 0 4px 12px rgba(0,0,0,.1);
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      color: var(--color-text-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: flex;
+      min-height: 100vh;
+      background: var(--color-bg-main);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 140px;
+      background: var(--color-sidebar);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 0;
+      box-shadow: 2px 0 8px rgba(0,0,0,.1);
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px 24px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      width: 50px;
+      height: 50px;
+      background: var(--color-primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(225,70,50,.3);
+    }
+
+    .brand span {
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      text-align: center;
+      letter-spacing: -0.3px;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      padding: 0 12px;
+    }
+
+    .nav a {
+      display: block;
+      padding: 14px 12px;
+      color: rgba(255,255,255,.7);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      transition: .2s;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .nav a:hover {
+      background: var(--color-sidebar-hover);
+      color: #fff;
+    }
+
+    .nav a.active {
+      background: var(--color-primary);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(225,70,50,.4);
+    }
+
+    .spacer {
+      flex: 1;
+      min-height: 40px;
+    }
+
+    /* Main */
+    .main {
+      margin-left: 140px;
+      flex: 1;
+      padding: 32px 40px;
+      background: var(--color-bg-main);
+      min-height: 100vh;
+    }
+
+    /* Filters */
+    .filters-section {
+      background: #fff;
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.1);
+    }
+
+    .filters-section h2 {
+      margin-bottom: 16px;
+      font-size: 18px;
+    }
+
+    .category-filter-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .category-box {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: var(--radius-sm);
+      padding: 16px;
+    }
+
+    .category-box h3 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      font-weight: 600;
+      border-bottom: 1px solid #dee2e6;
+      padding-bottom: 8px;
+    }
+
+    .category-box label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .category-box input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--color-primary);
+    }
+
+    /* Chart */
+    .sales-overview {
+      background: var(--color-chart-bg);
+      border: 2px solid #9b7fb8;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .sales-overview h2 {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 350px;
+      background: #fff;
+      border-radius: var(--radius-md);
+      padding: 20px;
+    }
+
+    /* Category cards */
+    .categories-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .category-card {
+      background: #4a4a4a;
+      border: 2px solid #3a3a3a;
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      color: #fff;
+    }
+
+    .category-card h3 {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .category-icon {
+      width: 16px;
+      height: 16px;
+      background: #ff6b6b;
+      border-radius: 3px;
+    }
+
+    .category-items {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .category-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .item-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    /* Fixed action buttons */
+    .action-buttons {
+      position: fixed;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 50;
+    }
+
+    .action-btn {
+      background: #4a4a4a;
+      color: #fff;
+      border: 2px solid #3a3a3a;
+      border-radius: var(--radius-md);
+      padding: 16px 14px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      text-align: center;
+      cursor: pointer;
+      transition: .2s;
+      width: 100px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    }
+
+    .action-btn:hover {
+      background: #5a5a5a;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    }
+
+    .error-message {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 16px 0;
+      border: 1px solid #f5c6cb;
+      text-align: center;
+    }
+
+    @media (max-width: 1200px) {
+      .action-buttons { display: none; }
+      .categories-section { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { width: 80px; }
+      .brand span { font-size: 11px; }
+      .nav a { padding: 12px 8px; font-size: 11px; }
+      .main { margin-left: 80px; padding: 24px 20px; }
+      .chart-container { height: 300px; padding: 12px; }
+      .sales-overview { padding: 16px; }
+      .category-card { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <span style="font-size:28px">👨🏻‍🍳</span>
+      </div>
+      <span>GastroTrack</span>
+    </div>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a href="dashboard.html"><span>Dashboard</span></a>
+      <a href="inventory.html"><span>Inventory</span></a>
+      <a href="expiry-calendar.html"><span>Expiry Calendar</span></a>
+      <a class="active" href="sales-report.html"><span>Sales Report</span></a>
+      <a href="cost-waste.html"><span>Cost & Waste</span></a>
+      <a href="suggestions.html"><span>Suggestions</span></a>
+      <a href="menu-insights.html"><span>Menu Insights</span></a>
+    </nav>
+
+    <div class="spacer"></div>
+    <nav class="nav">
+      <a href="profile.html"><span>Profile</span></a>
+      <a href="logout.html"><span>Log Out</span></a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- Category Filters -->
+    <section class="filters-section">
+      <h2>Filter by Categories</h2>
+      <div id="category-filters" class="category-filter-container"></div>
+    </section>
+
+    <!-- Sales Overview Chart -->
+    <section class="sales-overview">
+      <h2>Sales Overview</h2>
+      <div class="chart-container">
+        <canvas id="salesChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories-section"></section>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="action-btn" onclick="viewItemReport()">VIEW ITEM<br>REPORT</button>
+      <button class="action-btn" onclick="viewSummary()">VIEW<br>SUMMARY</button>
+      <button class="action-btn" onclick="viewFullSales()">VIEW FULL<br>SALES</button>
+    </div>
+  </main>
+
+  <script>
+    // Config - API endpoints
+    const API_BASE = 'http://127.0.0.1:5000';
+    const ENDPOINTS = {
+      overview: `${API_BASE}/api/sales/overview`,
+      categories: `${API_BASE}/api/sales`
+    };
+
+    let salesChart = null;
+
+    // Helper function for API calls
+    async function fetchJSON(url) {
+      try {
+        const res = await fetch(url, { 
+          headers: { 'Content-Type': 'application/json' } 
+        });
+        if (!res.ok) {
+          const text = await res.text().catch(() => '');
+          throw new Error(`${url} -> HTTP ${res.status} ${res.statusText} :: ${text}`);
+        }
+        return res.json();
+      } catch (error) {
+        console.error('Fetch error:', error);
+        throw error;
+      }
+    }
+
+    async function fetchSalesData() {
+      try {
+        // 1) Get overview data for chart
+        const overviewData = await fetchJSON(ENDPOINTS.overview);
+
+        // Expected shape:
+        // {
+        //   "Latte": { "category":"Hot Beverages", "sales": { "Monday": 3, ... } },
+        //   "Mocha": { "category":"Cold Beverages", "sales": { "Monday": 1, ... } },
+        //   ...
+        // }
+
+        const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+        const colors = ['#e74c3c','#3498db','#2ecc71','#f39c12','#9b59b6','#1abc9c','#e67e22','#34495e','#95a5a6','#d35400'];
+
+        const datasets = [];
+        let idx = 0;
+        
+        Object.keys(overviewData || {}).forEach(itemName => {
+          const row = overviewData[itemName] || {};
+          const sales = row.sales || {};
+          datasets.push({
+            label: itemName,
+            data: days.map(d => Number(sales[d] ?? 0)),
+            borderColor: colors[idx % colors.length],
+            backgroundColor: colors[idx % colors.length] + '20',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4
+          });
+          idx++;
+        });
+
+        // Create chart
+        const ctx = document.getElementById('salesChart');
+        if (ctx) {
+          if (salesChart) salesChart.destroy();
+          salesChart = new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: { 
+              labels: days.map(d => d.slice(0,3)), 
+              datasets 
+            },
+            options: {
+              responsive: true, 
+              maintainAspectRatio: false,
+              interaction: { 
+                mode: 'index', 
+                intersect: false 
+              },
+              plugins: {
+                legend: { 
+                  display: true, 
+                  position: 'top',
+                  labels: { 
+                    boxWidth: 12, 
+                    boxHeight: 12, 
+                    usePointStyle: true, 
+                    pointStyle: 'circle', 
+                    font: { size: 11, family: 'Inter' }, 
+                    padding: 12 
+                  }
+                },
+                tooltip: { 
+                  backgroundColor: 'rgba(0,0,0,.8)', 
+                  padding: 12, 
+                  cornerRadius: 8,
+                  callbacks: { 
+                    afterLabel: () => 'Units sold' 
+                  }
+                }
+              },
+              scales: {
+                y: { 
+                  beginAtZero: true, 
+                  ticks: { 
+                    stepSize: 1, 
+                    font: { size: 11 }, 
+                    callback: v => Math.floor(v) 
+                  }, 
+                  grid: { color: 'rgba(0,0,0,.05)' }, 
+                  title: { display: true, text: 'Units Sold' } 
+                },
+                x: { 
+                  ticks: { font: { size: 11 } }, 
+                  grid: { display: false }, 
+                  title: { display: true, text: 'Days of Week' } 
+                }
+              }
+            }
+          });
+        }
+
+        loadCategoryFilters(overviewData);
+
+        // 2) Get categories data
+        const categoriesPayload = await fetchJSON(ENDPOINTS.categories);
+        renderCategories(categoriesPayload);
+
+      } catch (err) {
+        console.error('[Sales] Fetch error:', err);
+        showErrorMessage('Failed to load sales data. Please check if the server is running.');
+      }
+    }
+
+    function renderCategories(payload) {
+      // Expected payload example:
+      // { "categories": [ { "name":"Hot Beverages", "items":[ { "name":"Latte","color":"#e74c3c" }, ... ] }, ... ] }
+      const section = document.querySelector('.categories-section');
+      if (!section) return;
+
+      const list = (payload && payload.categories) ? payload.categories : [];
+      section.innerHTML = '';
+      
+      list.forEach(cat => {
+        const card = document.createElement('div');
+        card.className = 'category-card';
+        card.innerHTML = `
+          <h3><span class="category-icon"></span>${cat.name}</h3>
+          <div class="category-items">
+            ${(cat.items || []).map(it => `
+              <div class="category-item">
+                <span class="item-indicator" style="background:${it.color || '#ccc'};"></span>
+                <span>${it.name}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        section.appendChild(card);
+      });
+    }
+
+    function loadCategoryFilters(data) {
+      const container = document.getElementById('category-filters');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const categories = {};
+      Object.keys(data || {}).forEach(item => {
+        const cat = (data[item] && data[item].category) ? data[item].category : 'Others';
+        (categories[cat] ||= []).push(item);
+      });
+
+      Object.keys(categories).forEach(cat => {
+        const box = document.createElement('div');
+        box.className = 'category-box';
+        box.innerHTML = `<h3>${cat}</h3>`;
+        
+        categories[cat].forEach(item => {
+          box.innerHTML += `<label><input type="checkbox" data-item="${item}" checked> ${item}</label>`;
+        });
+        
+        container.appendChild(box);
+      });
+
+      container.addEventListener('change', e => {
+        if (e.target.type === 'checkbox') {
+          updateChartVisibility();
+        }
+      });
+    }
+
+    function updateChartVisibility() {
+      if (!salesChart) return;
+      
+      const checks = document.querySelectorAll('#category-filters input[type="checkbox"]');
+      const visible = Array.from(checks).filter(cb => cb.checked).map(cb => cb.dataset.item);
+      
+      salesChart.data.datasets.forEach((ds, i) => {
+        const meta = salesChart.getDatasetMeta(i);
+        meta.hidden = !visible.includes(ds.label);
+      });
+      
+      salesChart.update('none');
+    }
+
+    function showErrorMessage(message) {
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error-message';
+      errorDiv.textContent = message;
+      
+      const main = document.querySelector('.main');
+      if (main) {
+        main.insertBefore(errorDiv, main.firstChild);
+        setTimeout(() => errorDiv.remove(), 5000);
+      }
+    }
+
+    // Action button functions
+    function viewItemReport() { 
+      alert('View Item Report - coming soon'); 
+    }
+    
+    function viewSummary() { 
+      alert('View Summary - coming soon'); 
+    }
+    
+    function viewFullSales() { 
+      alert('View Full Sales - coming soon'); 
+    }
+
+    // Initialize when page loads
+    window.addEventListener('load', fetchSalesData);
+  </script>
+</body>
+</html>

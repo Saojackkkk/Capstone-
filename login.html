@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GastroTrack - Login</title>
+    
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --brand: #f24a2e;
+            --surface: #f7f1ea;
+            --ink: #1a1a1a;
+            --border: #ea4b30;
+            --btn: #3a3a3a;
+            --font: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        }
+        
+        * { box-sizing: border-box }
+        html, body { height: 100% }
+        
+        body {
+            margin: 0;
+            font-family: var(--font);
+            color: var(--ink);
+            background: var(--brand);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        
+        .card {
+            width: min(520px, 92vw);
+            background: var(--surface);
+            border: 1px solid #eadfce;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .12);
+            padding: 34px 32px 26px;
+            text-align: center;
+        }
+        
+        /* Logo with small red badge like other pages */
+        .logo-wrap {
+            position: relative;
+            width: 110px;
+            margin: 4px auto 20px;
+        }
+        
+        .logo {
+            width: 110px;
+            height: 110px;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .badge {
+            position: absolute;
+            left: -8px;
+            top: 8px;
+            width: 8px;
+            height: 8px;
+            background: #e4321b;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px var(--surface);
+        }
+        
+        /* Inputs matching signup style */
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            height: 36px;
+            font-size: 13px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 12px;
+            outline: none;
+            background: #fff;
+            transition: border-color .2s, box-shadow .2s;
+            margin-bottom: 10px;
+        }
+        
+        /* Password input container for eye icon */
+        .password-container {
+            position: relative;
+            margin-bottom: 10px;
+        }
+        
+        .password-container input {
+            margin-bottom: 0;
+            padding-right: 40px;
+        }
+        
+        /* Eye icon for password visibility toggle */
+        .eye-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        
+        .eye-icon:hover {
+            opacity: 1;
+        }
+        
+        input:focus {
+            box-shadow: 0 0 0 2px rgba(234, 75, 48, .15);
+        }
+        
+        input::placeholder {
+            color: #999;
+        }
+        
+        /* Button matching other pages */
+        .btn {
+            width: 130px;
+            height: 34px;
+            margin: 16px auto 8px;
+            display: block;
+            border: 0;
+            border-radius: 6px;
+            background: var(--btn);
+            color: #fff;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+        
+        .error-message {
+            color: #e14632;
+            margin: 8px 0;
+            text-align: center;
+            display: none;
+            font-size: 12px;
+            padding: 8px;
+            background: #ffeaea;
+            border: 1px solid #e14632;
+            border-radius: 6px;
+        }
+        
+        .default-credentials {
+            background: #f0f8ff;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 12px;
+        }
+        
+        .default-credentials strong {
+            color: #d0553f;
+        }
+        
+        /* Meta link matching other pages */
+        .meta {
+            font-size: 12px;
+            color: #7b7f86;
+            margin-top: 4px;
+        }
+        
+        .meta a {
+            color: #d0553f;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .meta a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo-wrap">
+            <span class="badge"></span>
+            <img src="img/logo.png" alt="GastroTrack Logo" class="logo">
+        </div>
+        
+        <div class="default-credentials">
+            <p><strong>Default Login:</strong></p>
+            <p>Username: <strong>admin</strong> | Password: <strong>admin123</strong></p>
+        </div>
+        
+        <form id="loginForm">
+            <input type="text" id="username" name="username" placeholder="Username" required value="admin">
+            
+            <div class="password-container">
+                <input type="password" id="password" name="password" placeholder="Password" required value="admin123">
+                <svg class="eye-icon" id="togglePassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+            </div>
+            
+            <div class="error-message" id="errorMessage"></div>
+            
+            <button type="submit" class="btn" id="loginBtn">Login</button>
+        </form>
+        
+        <p class="meta">Don't have an account? <a href="signup.html">Create one here</a></p>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:5000/api';
+        
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const loginBtn = document.getElementById('loginBtn');
+            const errorMessage = document.getElementById('errorMessage');
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Disable button and show loading state
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Logging in...';
+            errorMessage.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/login`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Login successful, redirect to profile page
+                    window.location.href = 'profile.html';
+                } else {
+                    // Show error message
+                    errorMessage.textContent = data.error || 'Login failed';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorMessage.textContent = 'Network error. Please try again.';
+                errorMessage.style.display = 'block';
+            } finally {
+                // Re-enable button
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
+            }
+        });
+        
+        // Password visibility toggle
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = this;
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                // Change to "eye slash" icon when password is visible
+                eyeIcon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                `;
+            } else {
+                passwordInput.type = 'password';
+                // Change back to normal "eye" icon when password is hidden
+                eyeIcon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
